@@ -2,9 +2,8 @@
 
 namespace BinaryEncodingScheme.Interfaces
 {
-    public interface IDecoder
+    public interface IDecoder<T>
     {
-        Message Decode(byte[] bytes);
-
+        T Decode(byte[] bytes);
     }
 }

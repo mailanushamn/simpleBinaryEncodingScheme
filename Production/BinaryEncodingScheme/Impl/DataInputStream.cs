@@ -13,8 +13,9 @@
             _reader = new BinaryReader(stream, System.Text.Encoding.UTF8);
         }
 
-        public string ReadString(int count)
+        public string ReadString()
         {
+            var count = _reader.ReadInt32();
             return new string(_reader.ReadChars(count));
         }
 
@@ -41,12 +42,9 @@
         {
             var dict = new Dictionary<string, string>();
             for (int i = 0; i < count; i++)
-            {
-                //ToDo: 1024 bytes for key or value so check if count can by 1=int 16 or iint32
-                var keycount = ReadInt32();
-                var key = ReadString(keycount);
-                var valCount = ReadInt32();
-                var value = ReadString(valCount);
+            {                            
+                var key = ReadString();              
+                var value = ReadString();
                 dict.Add(key, value);            
             }
             return dict;          

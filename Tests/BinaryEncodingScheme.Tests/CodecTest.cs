@@ -7,21 +7,28 @@ using Xunit;
 
 namespace BinaryEncodingScheme.Tests
 {
-    public class CodecTest
+    public class CodecTests
     {
+        public CodecTests()
+        {
+            
+        }
         [Fact]
-        public void EncodeValidMessageTest()
+        public void EncodeDecodeValidMessageTest()
         {
             //Arrange
             var message = GetMessage();
-            IEncoder binaryEncoder = new BinaryCodec();
+            IEncoder<Message> binaryEncoder = new BinaryCodec();
+            IDecoder<Message> binaryDecoder = new BinaryCodec();
+
 
             //Act
             var bytes = binaryEncoder.Encode(message);
-            Console.WriteLine("encoded meassge " + bytes.ToString());
+            var decodeMessage = binaryDecoder.Decode(bytes);
 
             //Assert
-            Assert.True(string.Equals(expectedResult, result.DataSource));
+            Assert.Equal(message.Payload.Length, decodeMessage.Payload.Length);
+            Assert.Equal(message.Headers.Count, decodeMessage.Headers.Count);
         }
 
         private Message GetMessage()

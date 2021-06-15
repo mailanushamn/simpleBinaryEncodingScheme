@@ -20,6 +20,11 @@
             var calculatedChecksum = CalculateChecksum(payload);
 
            return calculatedChecksum.SequenceEqual(checksum);
-        }      
+        }
+
+        public static byte[] GetBytes(string value)
+        {
+           return  System.Text.Encoding.UTF8.GetBytes(value);
+        }
     }
 }

@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     public interface IDataInputStream
     {
-        string ReadString(int count);
+        string ReadString();
         char ReadChar();
         int ReadInt32();
         short ReadIn16();

@@ -5,8 +5,9 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
-    public interface IEncoder<T>
+    public interface IValidator
     {
-        byte[] Encode(T msg);
+        bool ValidateBeforeEncoding();
+        bool ValidateAfterDecoding();
     }
 }

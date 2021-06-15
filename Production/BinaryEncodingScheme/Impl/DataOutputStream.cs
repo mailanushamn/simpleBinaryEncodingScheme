@@ -15,9 +15,11 @@ namespace BinaryEncodingScheme.Impl
             _writer = new BinaryWriter(stream);
         }
 
-        public void Write(string value)
+        public void Write(int length,string value)
         {
-            var bytes = Encoding.UTF8.GetBytes(value);
+            var lengthInBytes = BitConverter.GetBytes(length);
+            WriteBytes(lengthInBytes);
+            var bytes = Encoding.ASCII.GetBytes(value);
             Write(bytes);
         }
 
@@ -64,13 +66,10 @@ namespace BinaryEncodingScheme.Impl
         {
             foreach (var item in values)
             {
-                //length of key - key - length of value - value
-                var keyLenBytes = BitConverter.GetBytes(item.Key.Length);
-                WriteBytes(keyLenBytes);
-                Write(item.Key);
-                var valLenBytes = BitConverter.GetBytes(item.Value.Length);
-                WriteBytes(valLenBytes);
-                Write(item.Value);
+              
+                Write(item.Key.Length,item.Key);
+              
+                Write(item.Value.Length,item.Value);
             }
         }
 

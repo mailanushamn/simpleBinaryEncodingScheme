@@ -1,7 +1,6 @@
 ﻿namespace BinaryEncodingScheme
 {
     using BinaryEncodingScheme.Interfaces;
-    using BinaryEncodingScheme.Models;
     using BinaryEncodingScheme.Utility;
     using System;
 
@@ -10,18 +9,18 @@
         public char Stx { get; private set; }
         public char Etx { get; private set; }
         public byte[] CheckSum { get; private set; }
-        public Message Message { get; private set; }
+        public IMessage Data { get; private set; }
 
         public Packet(
-            Message message)
+            IMessage data)
             : this()
         {
-            Message = message;
+            Data = data;
         }
 
         public Packet()
         {
-            Message = new Message();
+            
             Stx = PacketConstants.Stx;
             Etx = PacketConstants.Etx;
         }
@@ -30,14 +29,16 @@
         {
             try
             {
+               
+                Data.ValidateBeforeEncoding();
                 outputStream.Write(Stx);
-                WritePacketData(outputStream);
+                WriteMessageData(outputStream);
                 WriteChecksum(outputStream);
                 outputStream.Write(Etx);
             }
             catch (Exception ex)
             {
-                throw new CustomErrorException(400, "Failed to encode message!");
+                throw new CustomErrorException(400, "Error while encoding message."+ ex.Message);
             }
         }
 
@@ -46,48 +47,41 @@
             try
             {
                 Stx = inputStream.ReadChar();
-                ReadPacketData(inputStream);
+                ReadMessageData(inputStream);
                 ReadChecksum(inputStream);
+                ValidatePacket();
                 Etx = inputStream.ReadChar();
             }
             catch (Exception ex)
             {
-
+                throw new CustomErrorException(400,"Error while decoding."+ ex.Message);
             }
         }
 
-        private void WritePacketData(IDataOutputStream outputStream)
+        private void WriteMessageData(IDataOutputStream outputStream)
         {
-            outputStream.Write(Message.Headers.Count);
-            outputStream.Write(Message.Headers);
-            outputStream.Write(Message.Payload.Length);
-            outputStream.Write(Message.Payload);
+            Data.Write(outputStream);
         }
 
         private void WriteChecksum(IDataOutputStream outputStream)
         {
-            var hash = Helper.CalculateChecksum(Message.Payload);
-            outputStream.Write(hash.Length);
-            outputStream.Write(hash);
+            Data.WriteChecksum(outputStream);
         }
 
-        private void ReadPacketData(IDataInputStream inputStream)
+        private void ReadMessageData(IDataInputStream inputStream)
         {
-            var headerCount = inputStream.ReadInt32();
-            Message.Headers = inputStream.ReadDictionary(headerCount);
-            var dataCount = inputStream.ReadInt32();
-            Message.Payload = inputStream.ReadBytes(dataCount);
-            ValidatePacket();
+            Data.Read(inputStream);
+            
         }
 
         private void ReadChecksum(IDataInputStream inputStream)
         {
-            var checksumCount = inputStream.ReadInt32();
-            CheckSum = inputStream.ReadBytes(checksumCount);
+            CheckSum = Data.ReadChecksum(inputStream);
         }
-        public void ValidatePacket()
+
+        private void ValidatePacket()
         {
-            if (Stx != PacketConstants.Stx || Etx != PacketConstants.Etx || !Helper.ValidateChecksum(CheckSum, Message.Payload))
+            if (Stx != PacketConstants.Stx || Etx != PacketConstants.Etx || !Data.ValidateAfterDecoding())
             {
                 throw new CustomErrorException(400, "Message is corrupted!");
             }
