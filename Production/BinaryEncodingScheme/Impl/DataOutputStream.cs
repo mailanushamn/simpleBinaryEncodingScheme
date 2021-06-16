@@ -47,11 +47,6 @@ namespace BinaryEncodingScheme.Impl
             Write(bytes);
         }
 
-        public void Dispose()
-        {
-            _writer.Dispose();
-        }
-
         public void Write(byte[] value)
         {
             WriteBytes(value);
@@ -71,6 +66,10 @@ namespace BinaryEncodingScheme.Impl
               
                 Write(item.Value.Length,item.Value);
             }
+        }
+        public void Dispose()
+        {
+            _writer.Dispose();
         }
 
     }

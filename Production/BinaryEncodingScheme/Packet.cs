@@ -4,12 +4,19 @@
     using BinaryEncodingScheme.Utility;
     using System;
 
+    /// <summary>
+    /// Creates a packet in the format <DLE><Stx>|CMD|Headers|Payload|Checksum|<DLE><Etx>
+    /// </summary>
     public class Packet : IReader, IWriter
     {
-        public char Stx { get; private set; }
-        public char Etx { get; private set; }
+        public char STX { get; private set; }
+        public char ETX { get; private set; }
+
+        public char DLE { get; private set; }
         public byte[] CheckSum { get; private set; }
         public IMessage Data { get; private set; }
+
+        public char CMD { get; private set; }
 
         public Packet(
             IMessage data)
@@ -19,26 +26,28 @@
         }
 
         public Packet()
-        {
-            
-            Stx = PacketConstants.Stx;
-            Etx = PacketConstants.Etx;
+        {         
+            STX = PacketConstants.STX;
+            ETX = PacketConstants.ETX;
+            DLE = PacketConstants.DLE;           
         }
 
         public void Write(IDataOutputStream outputStream)
         {
             try
-            {
-               
+            {               
                 Data.ValidateBeforeEncoding();
-                outputStream.Write(Stx);
+                outputStream.Write(DLE);
+                outputStream.Write(STX);
+                WriteCommand(outputStream);
                 WriteMessageData(outputStream);
                 WriteChecksum(outputStream);
-                outputStream.Write(Etx);
+                outputStream.Write(DLE);
+                outputStream.Write(ETX);
             }
             catch (Exception ex)
             {
-                throw new CustomErrorException(400, "Error while encoding message."+ ex.Message);
+                throw ex;
             }
         }
 
@@ -46,18 +55,25 @@
         {
             try
             {
-                Stx = inputStream.ReadChar();
+                DLE = inputStream.ReadChar();
+                STX = inputStream.ReadChar();
+                CMD = inputStream.ReadChar();
                 ReadMessageData(inputStream);
                 ReadChecksum(inputStream);
                 ValidatePacket();
-                Etx = inputStream.ReadChar();
+                ETX = inputStream.ReadChar();
+                DLE = inputStream.ReadChar();
             }
             catch (Exception ex)
             {
-                throw new CustomErrorException(400,"Error while decoding."+ ex.Message);
+                throw ex;
             }
         }
-
+        private void WriteCommand(IDataOutputStream outputStream)
+        {
+            CMD = Data.GetType();
+            outputStream.Write(CMD);
+        }
         private void WriteMessageData(IDataOutputStream outputStream)
         {
             Data.Write(outputStream);
@@ -81,7 +97,7 @@
 
         private void ValidatePacket()
         {
-            if (Stx != PacketConstants.Stx || Etx != PacketConstants.Etx || !Data.ValidateAfterDecoding())
+            if (STX != PacketConstants.STX || ETX != PacketConstants.ETX || DLE!=PacketConstants.DLE|| !Data.ValidateAfterDecoding())
             {
                 throw new CustomErrorException(400, "Message is corrupted!");
             }

@@ -17,16 +17,14 @@ namespace simpleBinaryEncodingScheme
             message.Payload= System.Text.Encoding.UTF8.GetBytes("anusha is awesome");
             message.Headers = dict;
 
-            var msgCodec = new MessageCodec<Message>();
+            var msgCodec = new BinaryCodec<Message>();
             var bytes = msgCodec.Encode(message);
-            Console.WriteLine("encoded meassge " + bytes.ToString());
-          
+            Console.WriteLine("encoded meassge " + bytes.ToString());          
             var decodeMessage = msgCodec.Decode(bytes);
             Console.WriteLine("decoded message " + System.Text.Encoding.UTF8.GetString(decodeMessage.Payload));
            
 
-            var employee = new Employee();
-            
+            var employee = new Employee();          
             employee.Header= new Header();
             employee.Payload = new Payload();
 
@@ -36,9 +34,13 @@ namespace simpleBinaryEncodingScheme
             employee.Payload.Id = 12345;
             employee.Payload.Designation = "software engineer";
 
-           var empBinaryCodec = new MessageCodec<Employee>();
+
+           var empBinaryCodec = new BinaryCodec<Employee>();
             var bytes1 = empBinaryCodec.Encode(employee);
             Console.WriteLine("encoded meassge " + bytes1.Length);
+
+            var name = "BinaryEncodingScheme.Models.Employee";
+
 
             var decodeMessage1 = (Employee)empBinaryCodec.Decode(bytes1);
             Console.WriteLine("decoded message: Name " + decodeMessage1.Payload.Name +"Id" + decodeMessage1.Payload.Id );

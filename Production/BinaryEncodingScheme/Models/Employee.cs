@@ -14,16 +14,23 @@ namespace BinaryEncodingScheme.Models
 
         public void Read(IDataInputStream inputStream)
         {
-            //read headers
-           Header = new Header();
-           Header.UnixTimeStamp= inputStream.ReadInt32();
-           Header.Version = inputStream.ReadInt32();
+            try
+            {
+                //read headers
+                Header = new Header();
+                Header.UnixTimeStamp = inputStream.ReadInt32();
+                Header.Version = inputStream.ReadInt32();
 
-            //read payload
-            Payload = new Payload();
-            Payload.Name = inputStream.ReadString();
-            Payload.Id = inputStream.ReadInt32();
-            Payload.Designation = inputStream.ReadString();
+                //read payload
+                Payload = new Payload();
+                Payload.Name = inputStream.ReadString();
+                Payload.Id = inputStream.ReadInt32();
+                Payload.Designation = inputStream.ReadString();
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(500, "Error while decoding employee object:"+ ex.Message);
+            }
         }
 
         public byte[] ReadChecksum(IDataInputStream inputStream)
@@ -46,14 +53,21 @@ namespace BinaryEncodingScheme.Models
 
         public void Write(IDataOutputStream outputStream)
         {
-            //write headers
-            outputStream.Write(Header.UnixTimeStamp);
-            outputStream.Write(Header.Version);
+            try
+            {
+                //write headers
+                outputStream.Write(Header.UnixTimeStamp);
+                outputStream.Write(Header.Version);
 
-           //write payload           
-            outputStream.Write(Payload.Name.Length,Payload.Name);
-            outputStream.Write(Payload.Id);
-            outputStream.Write(Payload.Designation.Length, Payload.Designation);
+                //write payload           
+                outputStream.Write(Payload.Name.Length, Payload.Name);
+                outputStream.Write(Payload.Id);
+                outputStream.Write(Payload.Designation.Length, Payload.Designation);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(500, "Error while encoding employee object" + ex.Message);
+            }
 
         }
 
@@ -64,13 +78,16 @@ namespace BinaryEncodingScheme.Models
             outputStream.Write(hash.Length);
             outputStream.Write(hash);
         }
+
+        public char GetType()
+        {
+            return PacketCommandConstant.EmployeeRegistration;
+        }
     }
     public class Header
     {
         public int Version { get; set; }
-        public int UnixTimeStamp { get; set; } 
-           
-
+        public int UnixTimeStamp { get; set; }
     }
 
     public class Payload

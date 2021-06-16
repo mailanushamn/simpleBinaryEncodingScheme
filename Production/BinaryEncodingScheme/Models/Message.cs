@@ -2,34 +2,49 @@
 {
     using BinaryEncodingScheme.Interfaces;
     using BinaryEncodingScheme.Utility;
+    using System;
     using System.Collections.Generic;
     using System.Text;
 
     public class Message : IMessage
-    {
-     
+    {   
         public Dictionary<string, string> Headers { get; set; }
         public byte[] Payload { get; set; }
-
         private byte[] CheckSum;
 
+        public char GetType()
+        {
+            return PacketCommandConstant.MessageRegistration;
+        }
         public bool ValidateBeforeEncoding()
         {
             ValidateHeader();
             ValidatePayLoad();
             return true;
         }
-
         public void Read(IDataInputStream inputStream)
         {
-            ReadHeaders(inputStream);
-            ReadPayload(inputStream);
+            try
+            {
+                ReadHeaders(inputStream);
+                ReadPayload(inputStream);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(500, "Error while encoding message:" + ex.Message);
+            }
         }
-
         public void Write(IDataOutputStream outputStream)
         {
-            WriteHeaders(outputStream);
-            WritePaylaod(outputStream);            
+            try
+            {
+                WriteHeaders(outputStream);
+                WritePaylaod(outputStream);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(500, "Error while decoding message:" + ex.Message);
+            }
         }
         public void WriteChecksum(IDataOutputStream outputStream)
         {
@@ -43,7 +58,6 @@
             CheckSum= inputStream.ReadBytes(checksumCount);
             return CheckSum;
         }
-
         private void ReadHeaders(IDataInputStream inputStream)
         {
             var headerCount = inputStream.ReadInt32();
@@ -54,7 +68,6 @@
             var dataCount = inputStream.ReadInt32();
             Payload = inputStream.ReadBytes(dataCount);
         }
-
         private void WriteHeaders(IDataOutputStream outputStream)
         {
             outputStream.Write(Headers.Count);
@@ -65,7 +78,6 @@
             outputStream.Write(Payload.Length);
             outputStream.Write(Payload);
         }
-
         private void ValidateHeader()
         {
             if (Headers.Count > 63)
@@ -91,7 +103,6 @@
                 throw new PayloadMaxSizeExceededException("Payload max limit of 256KB is exceeded");
             }
         }
-
         public bool ValidateAfterDecoding()
         {
            return Helper.ValidateChecksum(CheckSum, Payload);

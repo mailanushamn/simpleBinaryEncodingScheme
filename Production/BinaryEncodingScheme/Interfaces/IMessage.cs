@@ -6,6 +6,7 @@ namespace BinaryEncodingScheme.Interfaces
 {
     public interface IMessage : IReader, IWriter, IValidator ,ICheckSumWriter, ICheckSumReader
     {
+        char GetType();
       
     }
 }

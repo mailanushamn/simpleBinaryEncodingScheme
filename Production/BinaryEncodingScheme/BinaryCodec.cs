@@ -2,11 +2,10 @@
 {
     using BinaryEncodingScheme.Impl;
     using BinaryEncodingScheme.Interfaces;
-    using BinaryEncodingScheme.Models;
     using System;
     using System.IO;
 
-    public class MessageCodec<T> : IEncoder<T>, IDecoder<T>  where T: IMessage
+    public class BinaryCodec<T> : IEncoder<T>, IDecoder<T>  where T: IMessage
     {
 
         /// <summary>
@@ -30,7 +29,6 @@
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(ex.Message);
                 return null;
             }
