@@ -1,9 +1,4 @@
-﻿using BinaryEncodingScheme.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BinaryEncodingScheme.Interfaces
+﻿namespace BinaryEncodingScheme.Interfaces
 {
     public interface IEncoder<T>
     {

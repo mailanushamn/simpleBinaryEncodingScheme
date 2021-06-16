@@ -1,4 +1,4 @@
-﻿namespace BinaryEncodingScheme.Models
+﻿namespace BinaryEncodingSchemeApp.Models
 {
     using BinaryEncodingScheme.Interfaces;
     using BinaryEncodingScheme.Utility;
@@ -12,7 +12,10 @@
         public byte[] Payload { get; set; }
         private byte[] CheckSum;
 
-        public char GetType()
+        private int MaxPayloadSize = 256000;
+        private int MaxHeaderSize = 1023;
+
+        public char GetObjectType()
         {
             return PacketCommandConstant.MessageRegistration;
         }
@@ -86,11 +89,11 @@
             }
             foreach (var item in Headers)
             {
-                if (Encoding.UTF8.GetByteCount(item.Key) > 1023)
+                if (Encoding.UTF8.GetByteCount(item.Key) > MaxHeaderSize)
                 {
                     throw new HeaderMaxSizeExceededException(item.Key + " exceeds max size of 1023 bytes");
                 }
-                if (Encoding.UTF8.GetByteCount(item.Value) > 1023)
+                if (Encoding.UTF8.GetByteCount(item.Value) > MaxHeaderSize)
                 {
                     throw new HeaderMaxSizeExceededException(item.Value + " exceeds max size of 1023 bytes");
                 }
@@ -98,7 +101,7 @@
         }
         private void ValidatePayLoad()
         {
-            if (Payload.Length > 256000)
+            if (Payload.Length > MaxPayloadSize)
             {
                 throw new PayloadMaxSizeExceededException("Payload max limit of 256KB is exceeded");
             }

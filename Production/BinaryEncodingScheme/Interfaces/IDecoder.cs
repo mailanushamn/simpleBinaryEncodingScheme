@@ -1,6 +1,4 @@
-﻿using BinaryEncodingScheme.Models;
-
-namespace BinaryEncodingScheme.Interfaces
+﻿namespace BinaryEncodingScheme.Interfaces
 {
     public interface IDecoder<T>
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BinaryEncodingScheme.Models
+namespace BinaryEncodingSchemeApp.Models
 {
     public class Employee : IMessage
     {
@@ -79,7 +79,7 @@ namespace BinaryEncodingScheme.Models
             outputStream.Write(hash);
         }
 
-        public char GetType()
+        public char GetObjectType()
         {
             return PacketCommandConstant.EmployeeRegistration;
         }

@@ -1,6 +1,5 @@
 ﻿using BinaryEncodingScheme;
-using BinaryEncodingScheme.Interfaces;
-using BinaryEncodingScheme.Models;
+using BinaryEncodingSchemeApp.Models;
 using System;
 using System.Collections.Generic;
 

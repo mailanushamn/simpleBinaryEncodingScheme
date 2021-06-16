@@ -13,7 +13,7 @@
         public char ETX { get; private set; }
 
         public char DLE { get; private set; }
-        public byte[] CheckSum { get; private set; }
+
         public IMessage Data { get; private set; }
 
         public char CMD { get; private set; }
@@ -35,13 +35,17 @@
         public void Write(IDataOutputStream outputStream)
         {
             try
-            {               
-                Data.ValidateBeforeEncoding();
+            {
+                if (!Data.ValidateBeforeEncoding())
+                {
+                    throw new CustomErrorException(400, "Validation failed.Invalid input.");
+                }
                 outputStream.Write(DLE);
                 outputStream.Write(STX);
-                WriteCommand(outputStream);
-                WriteMessageData(outputStream);
-                WriteChecksum(outputStream);
+                CMD = Data.GetObjectType();
+                outputStream.Write(CMD);
+                Data.Write(outputStream);
+                Data.WriteChecksum(outputStream);
                 outputStream.Write(DLE);
                 outputStream.Write(ETX);
             }
@@ -58,41 +62,16 @@
                 DLE = inputStream.ReadChar();
                 STX = inputStream.ReadChar();
                 CMD = inputStream.ReadChar();
-                ReadMessageData(inputStream);
-                ReadChecksum(inputStream);
-                ValidatePacket();
-                ETX = inputStream.ReadChar();
+                Data.Read(inputStream);
+                Data.ReadChecksum(inputStream);
+                ValidatePacket();               
                 DLE = inputStream.ReadChar();
+                ETX = inputStream.ReadChar();
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-        }
-        private void WriteCommand(IDataOutputStream outputStream)
-        {
-            CMD = Data.GetType();
-            outputStream.Write(CMD);
-        }
-        private void WriteMessageData(IDataOutputStream outputStream)
-        {
-            Data.Write(outputStream);
-        }
-
-        private void WriteChecksum(IDataOutputStream outputStream)
-        {
-            Data.WriteChecksum(outputStream);
-        }
-
-        private void ReadMessageData(IDataInputStream inputStream)
-        {
-            Data.Read(inputStream);
-            
-        }
-
-        private void ReadChecksum(IDataInputStream inputStream)
-        {
-            CheckSum = Data.ReadChecksum(inputStream);
         }
 
         private void ValidatePacket()
