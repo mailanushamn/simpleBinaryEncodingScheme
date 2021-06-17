@@ -5,7 +5,7 @@
     using System;
 
     /// <summary>
-    /// Creates a packet in the format <DLE><Stx>|CMD|Headers|Payload|Checksum|<DLE><Etx>
+    /// Creates a packet in the format <DLE><Stx>|Identifier|Headers|Payload|Checksum|<DLE><Etx>
     /// </summary>
     public class BinaryPacket : IReader, IWriter
     {
@@ -16,7 +16,7 @@
 
         public IMessage Data { get; private set; }
 
-        public int CMD { get; private set; }
+        public int Identifier { get; private set; }
 
         public BinaryPacket(
             IMessage data)
@@ -42,8 +42,8 @@
                 }
                 outputStream.Write(DLE);
                 outputStream.Write(STX);
-                CMD = Data.GetObjectType();
-                outputStream.Write(CMD);
+                Identifier = Data.GetObjectType();
+                outputStream.Write(Identifier);
                 Data.Write(outputStream);
                 Data.WriteChecksum(outputStream);
                 outputStream.Write(DLE);
@@ -65,7 +65,7 @@
             {
                 DLE = inputStream.ReadChar();
                 STX = inputStream.ReadChar();
-                CMD = inputStream.ReadInt32();
+                Identifier = inputStream.ReadInt32();
                 Data.Read(inputStream);
                 Data.ReadChecksum(inputStream);
                 ValidatePacket();               

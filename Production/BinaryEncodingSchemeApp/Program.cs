@@ -38,8 +38,8 @@ namespace BinaryEncodingApp
 
         private static IMessage Decode(byte[] bytes)
         {
-            var cmd = BinaryHelper.GetCommandType(bytes);
-            var instance = CreateInstance.GetInstance(cmd);
+            var identifier = BinaryHelper.GetIdentifier(bytes);
+            var instance = CreateInstance.GetInstance(identifier);
             return instance.Decode(bytes);
         }
 

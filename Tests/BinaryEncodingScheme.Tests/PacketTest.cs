@@ -28,7 +28,7 @@ namespace BinaryEncodingScheme.Tests
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);         
             var expectedDLE = PacketConstants.DLE;
             var expectedSTX = PacketConstants.STX;
-            var exceptedCMD = 'A';
+            var exceptedIdentifier = 'A';
             var packetToTest = new BinaryPacket(_mockMessage.Object);
 
             //Act
@@ -40,7 +40,7 @@ namespace BinaryEncodingScheme.Tests
             //Assert
             Assert.Equal(expectedDLE, packetToTest.DLE);
             Assert.Equal(expectedSTX, packetToTest.STX);
-            Assert.Equal(exceptedCMD, packetToTest.CMD);
+            Assert.Equal(exceptedIdentifier, packetToTest.Identifier);
         }
 
         [Fact]
@@ -50,10 +50,7 @@ namespace BinaryEncodingScheme.Tests
             _mockMessage.Setup(x => x.ValidateBeforeEncoding()).Returns(false);
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);
-            var expectedDLE = PacketConstants.DLE;
-            var expectedSTX = PacketConstants.STX;
-            var exceptedCMD = 'A';
-
+           
             //Act and Assert
             var packetToTest = new BinaryPacket(_mockMessage.Object);
             Assert.Throws<CustomErrorException>(()=>packetToTest.Write(dataOutputStream));

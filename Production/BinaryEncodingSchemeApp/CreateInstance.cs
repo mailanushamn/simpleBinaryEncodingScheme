@@ -9,9 +9,9 @@
         {
             switch (command)
             {
-                case PacketCommandConstant.MessageRegistration:
+                case PacketIdentifierConstant.MessageRegistration:
                     return typeof(Message);
-                case PacketCommandConstant.EmployeeRegistration:
+                case PacketIdentifierConstant.EmployeeRegistration:
                     return typeof(Employee);
                 case '\0':
                     return null;                  
@@ -23,9 +23,9 @@
         {
             switch (command)
             {
-                case PacketCommandConstant.MessageRegistration:
+                case PacketIdentifierConstant.MessageRegistration:
                     return new BinaryCodec<Message>();
-                case PacketCommandConstant.EmployeeRegistration:
+                case PacketIdentifierConstant.EmployeeRegistration:
                     return new BinaryCodec<Employee>();
                 case '\0':
                     return null;

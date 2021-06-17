@@ -7,7 +7,7 @@
         /// </summary>
         /// <param name="encodedData"></param>
         /// <returns></returns>
-        public static char GetCommandType(byte[] encodedData)
+        public static char GetIdentifier(byte[] encodedData)
         {
             return (char)(encodedData[2]);
         }

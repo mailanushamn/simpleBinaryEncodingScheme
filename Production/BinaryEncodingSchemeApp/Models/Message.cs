@@ -21,7 +21,7 @@
         /// <returns></returns>
         public char GetObjectType()
         {
-            return PacketCommandConstant.MessageRegistration;
+            return PacketIdentifierConstant.MessageRegistration;
         }
 
         /// <summary>

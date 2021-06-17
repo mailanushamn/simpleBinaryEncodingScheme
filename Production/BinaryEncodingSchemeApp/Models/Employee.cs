@@ -106,7 +106,7 @@ namespace BinaryEncodingApp.Models
 
         public char GetObjectType()
         {
-            return(char) PacketCommandConstant.EmployeeRegistration;
+            return(char) PacketIdentifierConstant.EmployeeRegistration;
         }
     }
 
