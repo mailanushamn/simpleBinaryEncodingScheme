@@ -4,6 +4,9 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
+    /// <summary>
+    /// interface for reading from output stream
+    /// </summary>
     public interface IDataOutputStream
     {
         void Write(char value);

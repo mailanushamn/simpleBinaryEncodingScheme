@@ -1,4 +1,4 @@
-﻿namespace BinaryEncodingSchemeApp.Models
+﻿namespace BinaryEncodingApp.Models
 {
     using BinaryEncodingScheme.Interfaces;
     using BinaryEncodingScheme.Utility;
@@ -15,16 +15,30 @@
         private int MaxPayloadSize = 256000;
         private int MaxHeaderSize = 1023;
 
+        /// <summary>
+        /// Returns the char representation of Message class.
+        /// </summary>
+        /// <returns></returns>
         public char GetObjectType()
         {
             return PacketCommandConstant.MessageRegistration;
         }
+
+        /// <summary>
+        /// Validates the message to be encoded.
+        /// </summary>
+        /// <returns></returns>
         public bool ValidateBeforeEncoding()
         {
             ValidateHeader();
             ValidatePayLoad();
             return true;
         }
+
+        /// <summary>
+        /// Reads the data from stream in the same written order.
+        /// </summary>
+        /// <param name="inputStream"></param>
         public void Read(IDataInputStream inputStream)
         {
             try
@@ -37,6 +51,11 @@
                 throw new CustomErrorException(500, "Error while encoding message:" + ex.Message);
             }
         }
+
+        /// <summary>
+        /// writes the object into stream in a order.First header count, headers,payload length and then payload
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void Write(IDataOutputStream outputStream)
         {
             try
@@ -49,17 +68,37 @@
                 throw new CustomErrorException(500, "Error while decoding message:" + ex.Message);
             }
         }
+
+        /// <summary>
+        /// Calculates checksum, writes the length of the checsum and checksum into the stream.
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void WriteChecksum(IDataOutputStream outputStream)
         {
             var hash = Helper.CalculateChecksum(Payload);
             outputStream.Write(hash.Length);
             outputStream.Write(hash);
         }
+
+        /// <summary>
+        /// Reads checksum length and cecksum from the stream.
+        /// </summary>
+        /// <param name="inputStream"></param>
+        /// <returns></returns>
         public byte[] ReadChecksum(IDataInputStream inputStream)
         {
             var checksumCount = inputStream.ReadInt32();
             CheckSum= inputStream.ReadBytes(checksumCount);
             return CheckSum;
+        }
+
+        /// <summary>
+        /// Validated the decoded message using checksum to ensure accuracy of the transmitted data.
+        /// </summary>
+        /// <returns></returns>
+        public bool ValidateAfterDecoding()
+        {
+            return Helper.ValidateChecksum(CheckSum, Payload);
         }
         private void ReadHeaders(IDataInputStream inputStream)
         {
@@ -106,9 +145,6 @@
                 throw new PayloadMaxSizeExceededException("Payload max limit of 256KB is exceeded");
             }
         }
-        public bool ValidateAfterDecoding()
-        {
-           return Helper.ValidateChecksum(CheckSum, Payload);
-        }
+       
     }
 }

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Production\BinaryEncodingSchemeApp\BinaryEncodingApp.csproj" />
     <ProjectReference Include="..\..\Production\BinaryEncodingScheme\BinaryEncodingScheme.csproj" />
   </ItemGroup>
 

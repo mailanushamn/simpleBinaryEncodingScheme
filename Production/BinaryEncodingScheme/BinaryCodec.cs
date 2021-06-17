@@ -7,9 +7,9 @@
 
     public class BinaryCodec<T> : IEncoder<T>, IDecoder<T>  where T: IMessage
     {
-
+        
         /// <summary>
-        /// 
+        /// Encodes any input object of type IMessage
         /// </summary>
         /// <param name="message"></param
         /// <returns></returns>
@@ -17,7 +17,7 @@
         {
             try
             {
-                var packet = new Packet(message);
+                var packet = new BinaryPacket(message);
                 using (var stream = new MemoryStream())
                 {
                     using (var dataWriter = new DataOutputStream(stream))
@@ -36,7 +36,7 @@
 
 
         /// <summary>
-        /// 
+        /// Decodes bytes into any output object of type IMessage
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
@@ -45,7 +45,7 @@
             try
             {
                 var message = Activator.CreateInstance<T>();
-                var packet = new Packet(message);
+                var packet = new BinaryPacket(message);
                 using var stream = new MemoryStream(bytes);
                 using (var inputStream = new DataInputStream(stream))
                 {
@@ -60,5 +60,7 @@
             }
         }
 
+       
     }
+    
 }

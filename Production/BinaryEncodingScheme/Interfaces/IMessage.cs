@@ -4,6 +4,9 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
+    /// <summary>
+    /// Interface to define the structure of an object which can be encoded using the custom binary protocol.
+    /// </summary>
     public interface IMessage : IReader, IWriter, IValidator ,ICheckSumWriter, ICheckSumReader
     {
         char GetObjectType();

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BinaryEncodingSchemeApp.Models
+namespace BinaryEncodingApp.Models
 {
     public class Employee : IMessage
     {
@@ -12,6 +12,10 @@ namespace BinaryEncodingSchemeApp.Models
         public Payload Payload { get; set; }
         private byte[] CheckSum;
 
+        /// <summary>
+        /// Reads headers and payload from stream.
+        /// </summary>
+        /// <param name="inputStream"></param>
         public void Read(IDataInputStream inputStream)
         {
             try
@@ -33,6 +37,11 @@ namespace BinaryEncodingSchemeApp.Models
             }
         }
 
+        /// <summary>
+        /// Reads checksum from the stream.
+        /// </summary>
+        /// <param name="inputStream"></param>
+        /// <returns></returns>
         public byte[] ReadChecksum(IDataInputStream inputStream)
         {
             var checksumCount = inputStream.ReadInt32();
@@ -40,17 +49,29 @@ namespace BinaryEncodingSchemeApp.Models
             return CheckSum;
         }
 
+        /// <summary>
+        /// Validates decoded object using checksum to ensure accuracy.
+        /// </summary>
+        /// <returns></returns>
         public bool ValidateAfterDecoding()
         {
             var payloadBytes = Helper.GetBytes(Payload.Name + Payload.Id);
             return Helper.ValidateChecksum(CheckSum, payloadBytes);
         }
 
+        /// <summary>
+        /// Validates object before encoding.
+        /// </summary>
+        /// <returns></returns>
         public bool ValidateBeforeEncoding()
         {
             return true;
         }
 
+        /// <summary>
+        /// Writes the object into stream in the order of headers, payload length and payload.
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void Write(IDataOutputStream outputStream)
         {
             try
@@ -71,6 +92,10 @@ namespace BinaryEncodingSchemeApp.Models
 
         }
 
+        /// <summary>
+        ///Calculates checksum and writes it to stream along with length.
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void WriteChecksum(IDataOutputStream outputStream)
         {
             var payloadBytes = Helper.GetBytes(Payload.Name + Payload.Id);
@@ -81,15 +106,22 @@ namespace BinaryEncodingSchemeApp.Models
 
         public char GetObjectType()
         {
-            return PacketCommandConstant.EmployeeRegistration;
+            return(char) PacketCommandConstant.EmployeeRegistration;
         }
     }
+
+    /// <summary>
+    /// Header of Employee object.
+    /// </summary>
     public class Header
     {
         public int Version { get; set; }
         public int UnixTimeStamp { get; set; }
     }
 
+    /// <summary>
+    /// Payload of Employee object.
+    /// </summary>
     public class Payload
     {
         public string Name { get; set; }

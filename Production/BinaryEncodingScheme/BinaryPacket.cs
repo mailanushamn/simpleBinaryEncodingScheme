@@ -7,7 +7,7 @@
     /// <summary>
     /// Creates a packet in the format <DLE><Stx>|CMD|Headers|Payload|Checksum|<DLE><Etx>
     /// </summary>
-    public class Packet : IReader, IWriter
+    public class BinaryPacket : IReader, IWriter
     {
         public char STX { get; private set; }
         public char ETX { get; private set; }
@@ -16,22 +16,22 @@
 
         public IMessage Data { get; private set; }
 
-        public char CMD { get; private set; }
+        public int CMD { get; private set; }
 
-        public Packet(
+        public BinaryPacket(
             IMessage data)
-            : this()
+            
         {
             Data = data;
-        }
-
-        public Packet()
-        {         
             STX = PacketConstants.STX;
             ETX = PacketConstants.ETX;
-            DLE = PacketConstants.DLE;           
+            DLE = PacketConstants.DLE;
         }
 
+        /// <summary>
+        /// Writes into stream in the order DLE,STX,CMD,Headers,Payload,DLE,ETX
+        /// </summary>
+        /// <param name="outputStream"></param>
         public void Write(IDataOutputStream outputStream)
         {
             try
@@ -55,13 +55,17 @@
             }
         }
 
+        /// <summary>
+        /// Reads from the stream in the order DLE,STX,CMD,Headers,Payload,DLE,ETX
+        /// </summary>
+        /// <param name="inputStream"></param>
         public void Read(IDataInputStream inputStream)
         {
             try
             {
                 DLE = inputStream.ReadChar();
                 STX = inputStream.ReadChar();
-                CMD = inputStream.ReadChar();
+                CMD = inputStream.ReadInt32();
                 Data.Read(inputStream);
                 Data.ReadChecksum(inputStream);
                 ValidatePacket();               
