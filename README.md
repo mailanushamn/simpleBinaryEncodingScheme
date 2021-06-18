@@ -8,7 +8,7 @@
 
 Simple Binary Message Encoding Scheme(SBME) is a library built to encode and decode any given object into binary and viceversa using a custom protocol.
 The custom protocol used is as below <br />
-**[DLE][STX][Identifier][Headers][PayloadLength][Payload][ChecksunLength][Checksum][DLE][ETX]** <br />
+### **[DLE][STX][Identifier][Headers][PayloadLength][Payload][ChecksunLength][Checksum][DLE][ETX]** <br />
 [DLE][STX] - Represents the start of the text. <br />
 [Identifier] - A single char which represents the type of the object in this case its always M. <br />
 [Headers] - Header of the Object. <br />
