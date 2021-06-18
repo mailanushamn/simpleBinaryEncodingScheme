@@ -33,8 +33,9 @@ The SBME exposes encode and decode methods to the client which can be used to en
        var codec = new MessageCodec<Message>();
        var encodedBytes=  codec.Encode(message);
        var decodedMessage = codec.Decode(encodedBytes);
+
+The sample code on how to use this can be found [here](https://github.com/mailanushamn/simpleBinaryEncodingScheme/blob/master/Production/BinaryEncodingSchemeApp/Program.cs) 
  
 
-]]></content>
-  <tabTrigger>readme</tabTrigger>
+</content>
 </snippet>
