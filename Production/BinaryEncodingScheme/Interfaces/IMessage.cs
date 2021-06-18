@@ -4,9 +4,7 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
-    public interface IMessage : IReader, IWriter, IValidator ,ICheckSumWriter, ICheckSumReader
+    public interface IMessage
     {
-        char GetType();
-      
     }
 }

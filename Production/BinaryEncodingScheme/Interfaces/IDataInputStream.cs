@@ -1,6 +1,9 @@
 ﻿namespace BinaryEncodingScheme.Interfaces
 {
     using System.Collections.Generic;
+    /// <summary>
+    /// Interface for reading from the stream
+    /// </summary>
     public interface IDataInputStream
     {
         string ReadString();

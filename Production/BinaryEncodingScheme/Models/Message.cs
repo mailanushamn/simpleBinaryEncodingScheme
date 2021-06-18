@@ -1,111 +1,15 @@
-﻿namespace BinaryEncodingScheme.Models
-{
-    using BinaryEncodingScheme.Interfaces;
-    using BinaryEncodingScheme.Utility;
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-    public class Message : IMessage
-    {   
+namespace BinaryEncodingScheme.Models
+{
+    /// <summary>
+    /// Defines Message properties. 
+    /// </summary>
+    public class Message 
+    {
         public Dictionary<string, string> Headers { get; set; }
         public byte[] Payload { get; set; }
-        private byte[] CheckSum;
-
-        public char GetType()
-        {
-            return PacketCommandConstant.MessageRegistration;
-        }
-        public bool ValidateBeforeEncoding()
-        {
-            ValidateHeader();
-            ValidatePayLoad();
-            return true;
-        }
-        public void Read(IDataInputStream inputStream)
-        {
-            try
-            {
-                ReadHeaders(inputStream);
-                ReadPayload(inputStream);
-            }
-            catch (Exception ex)
-            {
-                throw new CustomErrorException(500, "Error while encoding message:" + ex.Message);
-            }
-        }
-        public void Write(IDataOutputStream outputStream)
-        {
-            try
-            {
-                WriteHeaders(outputStream);
-                WritePaylaod(outputStream);
-            }
-            catch (Exception ex)
-            {
-                throw new CustomErrorException(500, "Error while decoding message:" + ex.Message);
-            }
-        }
-        public void WriteChecksum(IDataOutputStream outputStream)
-        {
-            var hash = Helper.CalculateChecksum(Payload);
-            outputStream.Write(hash.Length);
-            outputStream.Write(hash);
-        }
-        public byte[] ReadChecksum(IDataInputStream inputStream)
-        {
-            var checksumCount = inputStream.ReadInt32();
-            CheckSum= inputStream.ReadBytes(checksumCount);
-            return CheckSum;
-        }
-        private void ReadHeaders(IDataInputStream inputStream)
-        {
-            var headerCount = inputStream.ReadInt32();
-            Headers = inputStream.ReadDictionary(headerCount);
-        }
-        private void ReadPayload(IDataInputStream inputStream)
-        {
-            var dataCount = inputStream.ReadInt32();
-            Payload = inputStream.ReadBytes(dataCount);
-        }
-        private void WriteHeaders(IDataOutputStream outputStream)
-        {
-            outputStream.Write(Headers.Count);
-            outputStream.Write(Headers);
-        }
-        private void WritePaylaod(IDataOutputStream outputStream)
-        {
-            outputStream.Write(Payload.Length);
-            outputStream.Write(Payload);
-        }
-        private void ValidateHeader()
-        {
-            if (Headers.Count > 63)
-            {
-                throw new HeaderMaxLimitExceededException("Max allowed header limit is 63.");
-            }
-            foreach (var item in Headers)
-            {
-                if (Encoding.UTF8.GetByteCount(item.Key) > 1023)
-                {
-                    throw new HeaderMaxSizeExceededException(item.Key + " exceeds max size of 1023 bytes");
-                }
-                if (Encoding.UTF8.GetByteCount(item.Value) > 1023)
-                {
-                    throw new HeaderMaxSizeExceededException(item.Value + " exceeds max size of 1023 bytes");
-                }
-            }
-        }
-        private void ValidatePayLoad()
-        {
-            if (Payload.Length > 256000)
-            {
-                throw new PayloadMaxSizeExceededException("Payload max limit of 256KB is exceeded");
-            }
-        }
-        public bool ValidateAfterDecoding()
-        {
-           return Helper.ValidateChecksum(CheckSum, Payload);
-        }
     }
 }

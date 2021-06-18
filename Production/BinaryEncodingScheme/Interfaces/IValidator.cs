@@ -1,13 +1,12 @@
 ﻿using BinaryEncodingScheme.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
+    /// <summary>
+    /// Interface for validating object before and after decoding.
+    /// </summary>
     public interface IValidator
     {
-        bool ValidateBeforeEncoding();
-        bool ValidateAfterDecoding();
+        bool ValidateMessage(Message message);
     }
 }

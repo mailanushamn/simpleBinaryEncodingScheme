@@ -4,8 +4,7 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
-    public interface ICheckSumReader
+    public interface IBinaryPacket: IReader, IWriter
     {
-        byte[] ReadChecksum(IDataInputStream inputStream);
     }
 }

@@ -1,10 +1,9 @@
-﻿using BinaryEncodingScheme.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BinaryEncodingScheme.Interfaces
+﻿namespace BinaryEncodingScheme.Interfaces
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IEncoder<T>
     {
         byte[] Encode(T msg);
