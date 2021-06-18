@@ -1,38 +1,40 @@
 ﻿using BinaryEncodingScheme.Impl;
 using BinaryEncodingScheme.Interfaces;
+using BinaryEncodingScheme.Models;
 using BinaryEncodingScheme.Utility;
 using Moq;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Xunit;
 
 namespace BinaryEncodingScheme.Tests
 {
     public class PacketTest
     {
-        Mock<IMessage> _mockMessage = new Mock<IMessage>();
+        Mock<IService> _mockMessageService = new Mock<IService>();
         
-
         public PacketTest()
-        {           
-            _mockMessage.Setup(x => x.GetObjectType()).Returns('A');
-            _mockMessage.Setup(x => x.ReadChecksum(It.IsAny<DataInputStream>())).Returns(new byte[1]);
-
+        {
+            _mockMessageService.Setup(x => x.GetObjectType()).Returns('A');
+        
         }
         [Fact]
         public void PacketWriteReadValidObject_ReturnsValue_Test()
         {
             //Arrange
-            _mockMessage.Setup(x => x.ValidateBeforeEncoding()).Returns(true);
-            _mockMessage.Setup(x => x.ValidateAfterDecoding()).Returns(true);
+            var message = GetValidMessage();
+            _mockMessageService.Setup(x => x.ValidateMessage(It.IsAny<Message>())).Returns(true);
+            _mockMessageService.Setup(x => x.Read(It.IsAny<DataInputStream>())).Returns(GetValidMessage());
+
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);         
             var expectedDLE = PacketConstants.DLE;
             var expectedSTX = PacketConstants.STX;
-            var exceptedIdentifier = 'A';
-            var packetToTest = new BinaryPacket(_mockMessage.Object);
+            var packetToTest = new BinaryPacket(_mockMessageService.Object);
 
             //Act
-            packetToTest.Write(dataOutputStream);
+            packetToTest.Write(dataOutputStream, message);
 
             var dataInputStream = new DataInputStream(new MemoryStream(outStream.ToArray()));
             packetToTest.Read(dataInputStream);
@@ -40,37 +42,42 @@ namespace BinaryEncodingScheme.Tests
             //Assert
             Assert.Equal(expectedDLE, packetToTest.DLE);
             Assert.Equal(expectedSTX, packetToTest.STX);
-            Assert.Equal(exceptedIdentifier, packetToTest.Identifier);
         }
 
         [Fact]
         public void PacketWriteInvalidObject_ThrowsException_Test()
         {
             //Arrange
-            _mockMessage.Setup(x => x.ValidateBeforeEncoding()).Returns(false);
+            _mockMessageService.Setup(x => x.ValidateMessage(It.IsAny<Message>())).Returns(false);
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);
            
             //Act and Assert
-            var packetToTest = new BinaryPacket(_mockMessage.Object);
-            Assert.Throws<CustomErrorException>(()=>packetToTest.Write(dataOutputStream));
-           
+            var packetToTest = new BinaryPacket(_mockMessageService.Object);
+            Assert.Throws<CustomErrorException>(()=>packetToTest.Write(dataOutputStream, null));         
         }
         [Fact]
         public void PacketReadInValidObject_ThrowsException_Test()
         {
             //Arrange
-            _mockMessage.Setup(x => x.ValidateBeforeEncoding()).Returns(true);
-            _mockMessage.Setup(x => x.ValidateAfterDecoding()).Returns(false);
+            _mockMessageService.Setup(x => x.ValidateMessage(It.IsAny<Message>())).Returns(true);
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);
-            var packetToTest = new BinaryPacket(_mockMessage.Object);
-            packetToTest.Write(dataOutputStream);
+            var packetToTest = new BinaryPacket(_mockMessageService.Object);
+            packetToTest.Write(dataOutputStream,null);
 
             //Act
             var dataInputStream = new DataInputStream(new MemoryStream(outStream.ToArray()));
             Assert.Throws<CustomErrorException>(() => packetToTest.Read(dataInputStream));
 
+        }
+        private Message GetValidMessage()
+        {
+            var message = new Message();
+            message.Headers = new Dictionary<string, string>();
+            message.Headers.Add("key", "value");
+            message.Payload = Encoding.ASCII.GetBytes("test payload");
+            return message;
         }
     }
 }

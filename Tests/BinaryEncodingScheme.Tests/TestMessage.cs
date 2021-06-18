@@ -7,6 +7,9 @@ namespace BinaryEncodingScheme.Tests
 {
     public class TestMessage : IMessage
     {
+        public Dictionary<string, string> Headers { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public byte[] Payload { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public char GetObjectType()
         {
             throw new NotImplementedException();
@@ -28,6 +31,16 @@ namespace BinaryEncodingScheme.Tests
         }
 
         public bool ValidateBeforeEncoding()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ValidateChecksum()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ValidateMessage()
         {
             throw new NotImplementedException();
         }

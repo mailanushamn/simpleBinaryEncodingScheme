@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BinaryEncodingScheme.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,6 @@ namespace BinaryEncodingScheme.Interfaces
     /// </summary>
     public interface IReader
     {
-        void Read(IDataInputStream inputStream);
+        Message Read(IDataInputStream inputStream);
     }
 }

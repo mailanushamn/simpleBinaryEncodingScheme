@@ -1,8 +1,13 @@
 ﻿using BinaryEncodingApp.Models;
 using BinaryEncodingScheme;
+using BinaryEncodingScheme.Impl;
 using BinaryEncodingScheme.Interfaces;
+using BinaryEncodingScheme.Models;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace BinaryEncodingApp
 {
@@ -10,70 +15,70 @@ namespace BinaryEncodingApp
     {
         static void Main(string[] args)
         {
+            var message = GetEmployeeMessage();
+            Console.WriteLine("Payload length before encoding: " + message.Payload.Length);
+            Console.WriteLine("Header count before encoding: " + message.Headers.Count);
 
-            var msgBytes = EncodeMessage();
-            dynamic decodeMessage = Decode(msgBytes);
-            Console.WriteLine("decoded message headers:");
-            foreach (var item in decodeMessage.Headers)
+            var codec = new MessageCodec<Message>();
+            var encodedBytes=  codec.Encode(message);
+            Console.WriteLine("Length of encoded bytes: " + encodedBytes.Length);
+
+            var decodedMessage = codec.Decode(encodedBytes);
+            Console.WriteLine("Header count after decoding: "+ decodedMessage.Headers.Count);
+
+            foreach (var item in decodedMessage.Headers)
             {
                 Console.WriteLine(item.Key + ": " + item.Value);
             }
-            Console.WriteLine("decoded message payload: \n" + System.Text.Encoding.UTF8.GetString(decodeMessage.Payload)+"\n");
+            Console.WriteLine("payload length after decoding: " + decodedMessage.Payload.Length);
 
-            var empBytes = EncodeEmployee();
-            dynamic decodeEmployee = Decode(empBytes);
-            Console.WriteLine("decode employee headers:\n UnixTimeStamp: " + decodeEmployee.Header.UnixTimeStamp + "\n Version: " + decodeEmployee.Header.Version);
-            Console.WriteLine("decoded message payload \n Name: " + decodeEmployee.Payload.Name+"\n" +" Id: " + decodeEmployee.Payload.Id + "\n Designation: " + decodeEmployee.Payload.Designation);
+            var employee = GetObject(decodedMessage.Payload);
+
+            Console.WriteLine("Name: " + employee.Name);
+            Console.WriteLine("Id: " + employee.Id);
+            Console.WriteLine("Designation: " + employee.Designation);
+
             Console.ReadLine();
-        }
-
-        private static byte[] EncodeMessage()
-        {
-            var message = GetMessage();
-            IEncoder<Message> msgEncoder = new BinaryCodec<Message>();
-            var messageBytes = msgEncoder.Encode(message);
-            Console.WriteLine("encoded message length: " + messageBytes.Length);
-            return messageBytes;
-        }
-
-        private static IMessage Decode(byte[] bytes)
-        {
-            var identifier = BinaryHelper.GetIdentifier(bytes);
-            var instance = CreateInstance.GetInstance(identifier);
-            return instance.Decode(bytes);
-        }
-
-        private static byte[] EncodeEmployee()
-        {
-            var employee = GetEmployee();
-            var empBinaryCodec = new BinaryCodec<Employee>();
-            var employeeBytes = empBinaryCodec.Encode(employee);
-            Console.WriteLine("encoded employee " + employeeBytes.Length);
-            return employeeBytes;
         }
 
         private static Employee GetEmployee()
         {
-           var employee= new Employee();
-            employee.Header = new Header();
-            employee.Payload = new Payload();
-            employee.Header.UnixTimeStamp = 1623946782;
-            employee.Header.Version = 1;
-            employee.Payload.Name = "Mr.Developer";
-            employee.Payload.Id = 12345;
-            employee.Payload.Designation = "software engineer";
+            var employee = new Employee();
+            employee.Name = "Mr.Developer";
+            employee.Id = 12345;
+            employee.Designation = "software engineer";
             return employee;
         }
 
-        private static Message GetMessage()
+        private static Message GetEmployeeMessage()
         {
-            var message = new Message();
-            var dict = new Dictionary<string, string>();
-            dict.Add("packetid", "1992"); //packet id- 1992
-            dict.Add("version", "1.2"); // type - msg
-            message.Payload = System.Text.Encoding.UTF8.GetBytes("sample text message which is encoded and decoded.");
-            message.Headers = dict;
-            return message;
+            var employee = GetEmployee();
+            var empMessage= new Message();
+            empMessage.Headers = new Dictionary<string, string>();
+            empMessage.Headers.Add("Version", "1.2");
+            empMessage.Headers.Add("Id", "1234");
+            empMessage.Headers.Add("Datetime", "18/6/2020");
+            empMessage.Headers.Add("Type", "Employee");
+            empMessage.Payload = GetBytes(employee);
+            return empMessage;
+        }
+        private static byte[] GetBytes(Employee employee)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, employee);
+                return ms.ToArray();
+            }
+        }
+        private static Employee GetObject(byte[] bytes)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream(bytes))
+            {
+                object obj = bf.Deserialize(ms);
+                return (Employee)obj;
+            }
         }
     }
 }

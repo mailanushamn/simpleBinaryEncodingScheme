@@ -1,4 +1,4 @@
-﻿namespace BinaryEncodingApp
+﻿namespace BinaryEncodingScheme.Utility
 {
     /// <summary>
     /// Represents the char representation of each model class which enables in identifying the type during decoding.

@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-    public static class Helper
+    public static class ChecksumHelper
     {
         /// <summary>
         /// Calculates the checksum on payload

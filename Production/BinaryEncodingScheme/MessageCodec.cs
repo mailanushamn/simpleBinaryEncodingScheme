@@ -2,11 +2,17 @@
 {
     using BinaryEncodingScheme.Impl;
     using BinaryEncodingScheme.Interfaces;
+    using BinaryEncodingScheme.Models;
     using System;
     using System.IO;
 
-    public class BinaryCodec<T> : IEncoder<T>, IDecoder<T>  where T: IMessage
+    public class MessageCodec<T> : IEncoder<T>, IDecoder<T>  where T: Message
     {
+        private IService _service;
+        public MessageCodec()
+        {
+            _service = new MessageService();
+        }
         
         /// <summary>
         /// Encodes any input object of type IMessage
@@ -17,12 +23,13 @@
         {
             try
             {
-                var packet = new BinaryPacket(message);
+                 
+                var packet = new BinaryPacket(_service);
                 using (var stream = new MemoryStream())
                 {
                     using (var dataWriter = new DataOutputStream(stream))
                     {
-                        packet.Write(dataWriter);
+                        packet.Write(dataWriter,message);
                         return stream.ToArray();
                     }
                 }
@@ -44,13 +51,13 @@
         {
             try
             {
-                var message = Activator.CreateInstance<T>();
-                var packet = new BinaryPacket(message);
+               
+                var packet = new BinaryPacket( _service);
                 using var stream = new MemoryStream(bytes);
                 using (var inputStream = new DataInputStream(stream))
                 {
-                    packet.Read(inputStream);
-                    return (T)packet.Data;
+                    var decodedData=packet.Read(inputStream);
+                    return (T)decodedData;
                 }
             }
             catch (Exception ex)
