@@ -9,9 +9,9 @@
     public class MessageCodec<T> : IEncoder<T>, IDecoder<T>  where T: Message
     {
         private IService<T> _service;
-        public MessageCodec()
+        public MessageCodec(IService<T> service)
         {
-            _service = new MessageService<T>();
+            _service = service;
         }
         
         /// <summary>

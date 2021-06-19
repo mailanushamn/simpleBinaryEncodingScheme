@@ -19,7 +19,9 @@ namespace BinaryEncodingApp
             Console.WriteLine("Payload length before encoding: " + message.Payload.Length);
             Console.WriteLine("Header count before encoding: " + message.Headers.Count);
 
-            var codec = new MessageCodec<Message>();
+            var service = new MessageService<Message>();
+            var codec = new MessageCodec<Message>(service);
+
             var encodedBytes=  codec.Encode(message);
             Console.WriteLine("Length of encoded bytes: " + encodedBytes.Length);
 
