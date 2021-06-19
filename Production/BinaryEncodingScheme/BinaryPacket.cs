@@ -7,7 +7,7 @@
     using System;
 
     /// <summary>
-    /// Creates a packet in the format <DLE><Stx>|Headers|Payload|Checksum|<DLE><Etx>
+    /// Creates a packet in the format <DLE><Stx>|Identifier|Headers|Payload|Checksum|<DLE><Etx>
     /// </summary>
     public class BinaryPacket<T> : IReader<T>, IWriter<T> 
     {
@@ -29,7 +29,7 @@
         }
 
         /// <summary>
-        /// Writes into stream in the order DLE,STX,CMD,Headers,Payload,DLE,ETX
+        /// Writes into stream in the order DLE,STX,Identifier,Headers,Payload,DLE,ETX
         /// </summary>
         /// <param name="outputStream"></param>
         public void Write(IDataOutputStream outputStream, T message)
@@ -42,6 +42,8 @@
                 }
                 outputStream.Write(DLE);
                 outputStream.Write(STX);
+                var identifier = _messageService.GetObjectType();
+                outputStream.Write(identifier);
                 _messageService.Write(outputStream, message);
                 _messageService.WriteChecksum(outputStream, message);
                 outputStream.Write(DLE);
@@ -54,7 +56,7 @@
         }
 
         /// <summary>
-        /// Reads from the stream in the order DLE,STX,CMD,Headers,Payload,DLE,ETX
+        /// Reads from the stream in the order DLE,STX,Identifier,Headers,Payload,DLE,ETX
         /// </summary>
         /// <param name="inputStream"></param>
         public T Read(IDataInputStream inputStream)
@@ -63,6 +65,7 @@
             {
                 DLE = inputStream.ReadChar();
                 STX = inputStream.ReadChar();
+                var identifier = inputStream.ReadChar();
                 var message = _messageService.Read(inputStream);
                 var checksum = _messageService.ReadChecksum(inputStream);
                 ValidatePacket(message, checksum);

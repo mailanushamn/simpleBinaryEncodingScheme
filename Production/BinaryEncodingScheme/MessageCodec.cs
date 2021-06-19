@@ -67,7 +67,10 @@
             }
         }
 
-       
+        public char GetObjectType(byte[] bytes)
+        {
+            return (char)bytes[2];
+        }       
     }
     
 }
