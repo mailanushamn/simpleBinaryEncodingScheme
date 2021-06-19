@@ -5,9 +5,10 @@
     using BinaryEncodingScheme.Utility;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
 
-    public class MessageService : IService
+    public class MessageService <T>: IService<T>  where T: Message
     {
         private int MaxPayloadSize = 256000;
         private int MaxHeaderSize = 1023;
@@ -25,7 +26,7 @@
         /// Validates the message to be encoded.
         /// </summary>
         /// <returns></returns>
-        public bool ValidateMessage(Message message)
+        public bool ValidateMessage(T message)
         {
             if (message == null)
             { return false; }
@@ -38,14 +39,14 @@
         /// Reads the data from stream in the same written order.
         /// </summary>
         /// <param name="inputStream"></param>
-        public Message Read(IDataInputStream inputStream)
+        public T Read(IDataInputStream inputStream)
         {
             try
             {
                 var message = new Message();
                 message.Headers= ReadHeaders(inputStream);
                 message.Payload=ReadPayload(inputStream);
-                return message;
+                return (T)message;
             }
             catch (Exception ex)
             {
@@ -57,7 +58,7 @@
         /// writes the object into stream in a order.First header count, headers,payload length and then payload
         /// </summary>
         /// <param name="outputStream"></param>
-        public void Write(IDataOutputStream outputStream, Message message)
+        public void Write(IDataOutputStream outputStream, T message)
         {
             try
             {
@@ -71,7 +72,60 @@
                 throw new CustomErrorException(500, "Error while encoding message:" + ex.Message);
             }
         }
-     
+
+        /// <summary>
+        /// Calculates checksum, writes the length of the checsum and checksum into the stream.
+        /// </summary>
+        /// <param name="outputStream"></param>
+        public void WriteChecksum(IDataOutputStream outputStream, T message)
+        {
+            try
+            {
+                if (message != null)
+                {
+                    var hash = ChecksumHelper.CalculateChecksum(message?.Payload);
+                    outputStream.Write(hash.Length);
+                    outputStream.Write(hash);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(400, "Error while writing checksum");
+            }
+        }
+
+        /// <summary>
+        /// Compares the checksum received in the transmitted packet with the calculated checksum on decoded payload.
+        /// </summary>
+        /// <param name="checksum"></param>
+        /// <param name="payload"></param>
+        /// <returns></returns>
+        public  bool ValidateChecksum(byte[] checksum, T message)
+        {
+            var calculatedChecksum = ChecksumHelper.CalculateChecksum(message.Payload);
+
+            return calculatedChecksum.SequenceEqual(checksum);
+        }
+
+        /// <summary>
+        /// Reads checksum length and cecksum from the stream.
+        /// </summary>
+        /// <param name="inputStream"></param>
+        /// <returns></returns>
+        public byte[] ReadChecksum(IDataInputStream inputStream)
+        {
+
+            try
+            {
+                var checksumCount = inputStream.ReadInt32();
+                return inputStream.ReadBytes(checksumCount);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomErrorException(400, "Error while reading checksum");
+            }
+        }
+
         private Dictionary<string,string> ReadHeaders(IDataInputStream inputStream)
         {
             var headerCount = inputStream.ReadInt32();

@@ -8,10 +8,10 @@
 
     public class MessageCodec<T> : IEncoder<T>, IDecoder<T>  where T: Message
     {
-        private IService _service;
+        private IService<T> _service;
         public MessageCodec()
         {
-            _service = new MessageService();
+            _service = new MessageService<T>();
         }
         
         /// <summary>
@@ -24,7 +24,7 @@
             try
             {
                  
-                var packet = new BinaryPacket(_service);
+                var packet = new BinaryPacket<T>(_service);
                 using (var stream = new MemoryStream())
                 {
                     using (var dataWriter = new DataOutputStream(stream))
@@ -52,7 +52,7 @@
             try
             {
                
-                var packet = new BinaryPacket( _service);
+                var packet = new BinaryPacket<T>( _service);
                 using var stream = new MemoryStream(bytes);
                 using (var inputStream = new DataInputStream(stream))
                 {

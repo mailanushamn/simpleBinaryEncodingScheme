@@ -8,8 +8,8 @@ namespace BinaryEncodingScheme.Interfaces
     /// <summary>
     /// Interface for writing into stream.
     /// </summary>
-    public interface IWriter
+    public interface IWriter<T>
     {
-        void Write(IDataOutputStream outputStream, Message message);
+        void Write(IDataOutputStream outputStream, T message);
     }
 }

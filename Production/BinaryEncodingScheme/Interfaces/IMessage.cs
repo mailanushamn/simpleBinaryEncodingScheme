@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BinaryEncodingScheme.Interfaces
 {
-    public interface IMessage
+    public  class IMessage
     {
     }
 }

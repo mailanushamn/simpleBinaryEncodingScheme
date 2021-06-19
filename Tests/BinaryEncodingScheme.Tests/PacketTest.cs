@@ -12,7 +12,7 @@ namespace BinaryEncodingScheme.Tests
 {
     public class PacketTest
     {
-        Mock<IService> _mockMessageService = new Mock<IService>();
+        Mock<IService<Message>> _mockMessageService = new Mock<IService<Message>>();
         
         public PacketTest()
         {
@@ -25,13 +25,17 @@ namespace BinaryEncodingScheme.Tests
             //Arrange
             var message = GetValidMessage();
             _mockMessageService.Setup(x => x.ValidateMessage(It.IsAny<Message>())).Returns(true);
+            _mockMessageService.Setup(x => x.ReadChecksum(It.IsAny<DataInputStream>())).Returns(new byte[1]);
+
+            _mockMessageService.Setup(x => x.ValidateChecksum(It.IsAny<byte[]>(),It.IsAny<Message>())).Returns(true);
+
             _mockMessageService.Setup(x => x.Read(It.IsAny<DataInputStream>())).Returns(GetValidMessage());
 
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);         
             var expectedDLE = PacketConstants.DLE;
             var expectedSTX = PacketConstants.STX;
-            var packetToTest = new BinaryPacket(_mockMessageService.Object);
+            var packetToTest = new BinaryPacket<Message>(_mockMessageService.Object);
 
             //Act
             packetToTest.Write(dataOutputStream, message);
@@ -53,7 +57,7 @@ namespace BinaryEncodingScheme.Tests
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);
            
             //Act and Assert
-            var packetToTest = new BinaryPacket(_mockMessageService.Object);
+            var packetToTest = new BinaryPacket<Message>(_mockMessageService.Object);
             Assert.Throws<CustomErrorException>(()=>packetToTest.Write(dataOutputStream, null));         
         }
         [Fact]
@@ -63,7 +67,7 @@ namespace BinaryEncodingScheme.Tests
             _mockMessageService.Setup(x => x.ValidateMessage(It.IsAny<Message>())).Returns(true);
             var outStream = new MemoryStream();
             IDataOutputStream dataOutputStream = new DataOutputStream(outStream);
-            var packetToTest = new BinaryPacket(_mockMessageService.Object);
+            var packetToTest = new BinaryPacket<Message>(_mockMessageService.Object);
             packetToTest.Write(dataOutputStream,null);
 
             //Act

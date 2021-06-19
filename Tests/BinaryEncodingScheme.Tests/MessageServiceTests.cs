@@ -12,10 +12,10 @@ namespace BinaryEncodingScheme.Tests
 {
     public class MessageServiceTests
     {
-        private IService messageService;
+        private IService<Message> messageService;
         public MessageServiceTests()
         {
-            messageService = new MessageService();
+            messageService = new MessageService<Message>();
         }
 
         [Fact]

@@ -5,8 +5,10 @@ namespace BinaryEncodingScheme.Interfaces
     /// <summary>
     /// Interface for validating object before and after decoding.
     /// </summary>
-    public interface IValidator
+    public interface IValidator<T>
     {
-        bool ValidateMessage(Message message);
+        bool ValidateMessage(T message);
+        bool ValidateChecksum(byte[] checksum, T message);
+
     }
 }

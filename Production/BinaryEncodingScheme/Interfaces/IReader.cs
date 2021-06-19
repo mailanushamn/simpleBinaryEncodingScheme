@@ -8,8 +8,8 @@ namespace BinaryEncodingScheme.Interfaces
     /// <summary>
     /// Interface for reader which reads from stream.
     /// </summary>
-    public interface IReader
+    public interface IReader<T>
     {
-        Message Read(IDataInputStream inputStream);
+        T Read(IDataInputStream inputStream);
     }
 }

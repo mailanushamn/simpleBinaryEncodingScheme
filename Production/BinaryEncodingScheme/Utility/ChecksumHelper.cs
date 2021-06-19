@@ -20,18 +20,7 @@
             return hash;
         }
 
-        /// <summary>
-        /// Compares the checksum received in the transmitted packet with the calculated checksum on decoded payload.
-        /// </summary>
-        /// <param name="checksum"></param>
-        /// <param name="payload"></param>
-        /// <returns></returns>
-        public static bool ValidateChecksum(byte[] checksum, byte[] payload)
-        {
-            var calculatedChecksum = CalculateChecksum(payload);
-
-           return calculatedChecksum.SequenceEqual(checksum);
-        }
+       
 
         /// <summary>
         /// Converts string to bytes.
