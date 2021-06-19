@@ -8,7 +8,7 @@ namespace BinaryEncodingScheme.Models
     /// <summary>
     /// Defines Message properties. 
     /// </summary>
-    public class Message : IMessage
+    public class Message
     {
         public Dictionary<string, string> Headers { get; set; }
         public byte[] Payload { get; set; }
