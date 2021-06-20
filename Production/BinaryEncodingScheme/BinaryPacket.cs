@@ -9,7 +9,7 @@
     /// <summary>
     /// Creates a packet in the format <DLE><Stx>|Identifier|Headers|Payload|Checksum|<DLE><Etx>
     /// </summary>
-    public class BinaryPacket<T> : IReader<T>, IWriter<T> 
+    internal class BinaryPacket<T> : IReader<T>, IWriter<T> 
     {
         public char STX { get; private set; }
         public char ETX { get; private set; }
