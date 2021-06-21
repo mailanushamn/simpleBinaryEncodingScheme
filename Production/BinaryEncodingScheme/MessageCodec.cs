@@ -15,7 +15,7 @@
         }
         
         /// <summary>
-        /// Encodes any input object of type IMessage
+        /// Encodes any input object of type Message
         /// </summary>
         /// <param name="message"></param
         /// <returns></returns>
@@ -43,7 +43,7 @@
 
 
         /// <summary>
-        /// Decodes bytes into any output object of type IMessage
+        /// Decodes bytes into any output object of type Message
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>

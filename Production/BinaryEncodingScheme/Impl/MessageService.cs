@@ -10,6 +10,7 @@
 
     public class MessageService <T>: IService<T>  where T: Message
     {
+        //below values should be read from config 
         private int MaxPayloadSize = 256000;
         private int MaxHeaderSize = 1023;
 

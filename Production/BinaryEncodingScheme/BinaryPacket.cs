@@ -1,8 +1,6 @@
 ﻿namespace BinaryEncodingScheme
 {
-    using BinaryEncodingScheme.Impl;
     using BinaryEncodingScheme.Interfaces;
-    using BinaryEncodingScheme.Models;
     using BinaryEncodingScheme.Utility;
     using System;
 
